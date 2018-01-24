@@ -3,9 +3,10 @@ package repo
 import (
 	"encoding/json"
 	"errors"
+	"time"
+
 	"github.com/ipfs/go-ipfs/repo"
 	"github.com/ipfs/go-ipfs/repo/config"
-	"time"
 )
 
 var DefaultBootstrapAddresses = []string{
@@ -51,6 +52,7 @@ type WalletConfig struct {
 	TrustedPeer      string
 	RPCUser          string
 	RPCPassword      string
+	Host             string
 }
 
 type DataSharing struct {

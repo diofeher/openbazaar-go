@@ -218,6 +218,7 @@ func addConfigExtensions(repoRoot string, testnet bool) error {
 		RPCUser:          "phorerpc",
 		RPCPassword:      "rpcpassword",
 		Binary:           "/usr/local/bin/phored",
+		Host:             "localhost:11772",
 	}
 
 	var a APIConfig = APIConfig{

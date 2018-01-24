@@ -50,22 +50,27 @@ type BitcoindWallet struct {
 	controlPort      int
 	useTor           bool
 	started          bool
+	host             string
 	scriptsToAdd     [][]byte
 }
 
 var connCfg = &rpcclient.ConnConfig{
-	Host:                 "localhost:11772",
 	HTTPPostMode:         true, // Bitcoin core only supports HTTP POST mode
 	DisableTLS:           true, // Bitcoin core does not provide TLS by default
 	DisableAutoReconnect: false,
 	DisableConnectOnNew:  false,
 }
 
-func NewBitcoindWallet(mnemonic string, params *chaincfg.Params, repoPath string, trustedPeer string, binary string, username string, password string, useTor bool, torControlPort int) *BitcoindWallet {
+func NewBitcoindWallet(mnemonic string, params *chaincfg.Params, repoPath string, trustedPeer string, binary string, username string, password string, useTor bool, torControlPort int, host string) *BitcoindWallet {
 	seed := b39.NewSeed(mnemonic, "")
 	mPrivKey, _ := hd.NewMaster(seed, params)
 	mPubKey, _ := mPrivKey.Neuter()
 
+	if host == "" {
+		host = "localhost:11772"
+	}
+
+	connCfg.Host = host
 	connCfg.User = username
 	connCfg.Pass = password
 

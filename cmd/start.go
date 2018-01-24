@@ -473,7 +473,7 @@ func (x *Start) Execute(args []string) error {
 		if usingTor && !usingClearnet {
 			usetor = true
 		}
-		cryptoWallet = bitcoind.NewBitcoindWallet(mn, &params, repoPath, walletCfg.TrustedPeer, walletCfg.Binary, walletCfg.RPCUser, walletCfg.RPCPassword, usetor, controlPort)
+		cryptoWallet = bitcoind.NewBitcoindWallet(mn, &params, repoPath, walletCfg.TrustedPeer, walletCfg.Binary, walletCfg.RPCUser, walletCfg.RPCPassword, usetor, controlPort, walletCfg.Host)
 	default:
 		log.Fatal("Unknown wallet type. Valid wallet types: phored")
 	}
