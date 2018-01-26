@@ -7,7 +7,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"os/exec"
+	"path"
 	"strconv"
 	"strings"
 	"time"
@@ -103,14 +105,19 @@ func (w *BitcoindWallet) BuildArguments(rescan bool) []string {
 		socksPort := defaultSocksPort(w.controlPort)
 		args = append(args, "-listen", "-proxy:127.0.0.1:"+strconv.Itoa(socksPort), "-onlynet=onion")
 	}
+
+	walletPath := path.Join(w.repoPath, "wallet")
+	if _, err := os.Stat(walletPath); os.IsNotExist(err) {
+		os.Mkdir(walletPath, 0644)
+	}
 	if w.separateWallet {
-		args = append(args, "-listen=0", "-datadir="+w.repoPath+"/wallet/", "-rpcuser="+connCfg.User, "-rpcpassword="+connCfg.Pass)
+		args = append(args, "-listen=0", "-datadir="+walletPath, "-rpcuser="+connCfg.User, "-rpcpassword="+connCfg.Pass)
 	}
 	return args
 }
 
 func (w *BitcoindWallet) Start() {
-	if w.separateWallet {
+	if !w.separateWallet {
 		w.shutdownIfActive()
 	}
 	args := w.BuildArguments(false)
