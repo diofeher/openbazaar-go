@@ -51,6 +51,7 @@ type BitcoindWallet struct {
 	useTor           bool
 	started          bool
 	scriptsToAdd     [][]byte
+	separateWallet   bool
 }
 
 var connCfg = &rpcclient.ConnConfig{
@@ -61,7 +62,7 @@ var connCfg = &rpcclient.ConnConfig{
 	DisableConnectOnNew:  false,
 }
 
-func NewBitcoindWallet(mnemonic string, params *chaincfg.Params, repoPath string, trustedPeer string, binary string, username string, password string, useTor bool, torControlPort int) *BitcoindWallet {
+func NewBitcoindWallet(mnemonic string, params *chaincfg.Params, repoPath string, trustedPeer string, binary string, username string, password string, useTor bool, torControlPort int, separateWallet bool) *BitcoindWallet {
 	seed := b39.NewSeed(mnemonic, "")
 	mPrivKey, _ := hd.NewMaster(seed, params)
 	mPubKey, _ := mPrivKey.Neuter()
@@ -82,6 +83,7 @@ func NewBitcoindWallet(mnemonic string, params *chaincfg.Params, repoPath string
 		binary:           binary,
 		controlPort:      torControlPort,
 		useTor:           useTor,
+		separateWallet:   separateWallet,
 	}
 	return &w
 }
@@ -101,11 +103,17 @@ func (w *BitcoindWallet) BuildArguments(rescan bool) []string {
 		socksPort := defaultSocksPort(w.controlPort)
 		args = append(args, "-listen", "-proxy:127.0.0.1:"+strconv.Itoa(socksPort), "-onlynet=onion")
 	}
+	if w.separateWallet {
+		args = append(args, "-listen=0", "-datadir=", w.repoPath)
+		fmt.Println(args)
+	}
 	return args
 }
 
 func (w *BitcoindWallet) Start() {
-	w.shutdownIfActive()
+	if w.separateWallet {
+		w.shutdownIfActive()
+	}
 	args := w.BuildArguments(false)
 	client, _ := rpcclient.New(connCfg, nil)
 	w.rpcClient = client
