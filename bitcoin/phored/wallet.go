@@ -104,8 +104,7 @@ func (w *BitcoindWallet) BuildArguments(rescan bool) []string {
 		args = append(args, "-listen", "-proxy:127.0.0.1:"+strconv.Itoa(socksPort), "-onlynet=onion")
 	}
 	if w.separateWallet {
-		args = append(args, "-listen=0", "-datadir=", w.repoPath)
-		fmt.Println(args)
+		args = append(args, "-listen=0", "-datadir="+w.repoPath, "-rpcuser="+connCfg.User, "-rpcpassword="+connCfg.Pass)
 	}
 	return args
 }
